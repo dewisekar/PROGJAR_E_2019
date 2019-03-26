@@ -18,7 +18,7 @@ def sendImage(trg_ip, trg_port):
     sock.sendto("SENDING", (trg_ip, trg_port))
     for i in namafile:
         #beritahu nama file yang dikirim
-        sock.sendto("GAMBAR {}".format(i), (trg_ip, trg_port))
+        sock.sendto("START {}" . format(i) , (trg_ip, trg_port))
         ukuran = os.stat(i).st_size
         fp = open(i,'rb')
         k = fp.read()
@@ -36,6 +36,6 @@ while True:
     data, addr = sock.recvfrom(1024)
     #signal from client
     if (data=="READY"):
-        thread = Thread(target = sendImage, args = (TARGET_IP, TARGET_PORT))
+        thread = Thread(target = sendImage, args = (addr))
         thread.start()
 
