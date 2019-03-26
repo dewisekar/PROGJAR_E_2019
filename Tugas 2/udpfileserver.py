@@ -27,7 +27,9 @@ def sendImage(trg_ip, trg_port):
             sock.sendto(x, (trg_ip, trg_port))
             terkirim = terkirim + 1
             print "\r Terkirim {} of {} " . format(terkirim,ukuran)
-    sock.sendto("DONE", (trg_ip, trg_port))
+        sock.sendto("DONE", (trg_ip, trg_port))
+        fp.close()
+    sock.sendto("END", (trg_ip, trg_port))
 
 while True:
     print "Menunggu koneksi dari client..."
