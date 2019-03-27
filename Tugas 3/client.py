@@ -36,7 +36,7 @@ try:
                     data = sock.recv(32)
                     if(data[0:5]=="START"):
                         print "Menerima ",data[6:]
-                        fp = open('cong.png','wb+')
+                        fp = open(data[6:],'wb+')
                         ditulis = 0
                     elif(data=="DONE"):
                         print data[0:6]
@@ -59,8 +59,9 @@ try:
                 sock.send(x)
                 terkirim = terkirim + 1
                 print "\r Terkirim {} of {} " . format(terkirim,ukuran)
-            sock.send("DONE")
             fp.close()
+            sock.send("DONE")
+            
 
         elif(reqs[0]=="fetch"):
             msg = sock.recv(1024)        

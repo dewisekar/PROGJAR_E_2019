@@ -49,20 +49,21 @@ def handleReq(conn):
                     print "\r Terkirim {} of {} " . format(terkirim,ukuran)
                 conn.send("DONE")
                 fp.close()
-        elif (data== 'upload'):
+
+        elif (data == 'upload'):
             while True:
-                tron = conn.recv(32)
-                if(tron[0:5]=="START"):
-                    print "Menerima ",tron[6:]
-                    fg = open('big.png','wb+')
-                    ditulis = 0
-                elif(tron=="DONE"):
-                    print tron[0:6]
-                    fg.close()
+                if(data[0:5]=="START"):
+                    print data[6:]
+                    namanya =  data[6:]
+                    fp = open(namanya,'wb+')
+                    ditulis=0
+                elif(data=="DONE"):
+                    fp.close()
                     break
                 else:
-                    print "Blok ", len(tron), tron[0:10]
-                    fg.write(tron)
+                    print "blok ", len(data), data[0:10]
+                    fp.write(data)
+            files.append(namanya)
 
 while True:
     print "waiting for a connection"
