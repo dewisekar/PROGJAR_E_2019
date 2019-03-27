@@ -13,14 +13,45 @@ sock.bind(server_address)
 #listen for incoming connection
 sock.listen(1)
 
+def post_receiver():
+
+    #m = open("metadata", "wb")
+    req_msg = ''
+    while True:
+        data = koneksi_client.recv(64)
+        req_msg = req_msg+data
+
+        if (len(data) < 64):
+            #m.write(req_msg)
+            filename = req_msg.split('filename="')
+            filename = filename[1]
+            index = filename.find('"')
+            filename = filename[:index:]
+            f = open(filename, "wb")
+            req_msg = req_msg.split("Content-Type: ")
+            req_msg = req_msg[2]
+            print req_msg[-60::]
+            index = req_msg.find("\r\n\r\n")
+            req_msg = req_msg[index+4::]
+            req_msg = req_msg.split("\n\r\n------WebKitForm")
+            break
+    f.write(req_msg[0])
+    f.close()
+
+
 #function for handle requests
-def handleRequest(connection, client_address):
+# fungsi melayani client
+def handleRequest(koneksi_client, alamat_client):
     try:
-        print>>sys.stderr, 'Connection from', client_address
+        print >> sys.stderr, 'ada koneksi dari ', alamat_client
         req_msg = ''
         while True:
-            data = connection.recv(32)
+            data = koneksi_client.recv(64)
+            #data = bytes.decode(data)
             req_msg = req_msg + data
+            if req_msg.startswith("POST") :
+                post_receiver()
+                break
             if (req_msg[-4:] == "\r\n\r\n"):
                 break
 
@@ -28,7 +59,9 @@ def handleRequest(connection, client_address):
         baris = req_msg.split("\r\n")
         baris_request = baris[0]
         print baris_request
+
         a, url, c = baris_request.split(" ")
+
 
         if (url.startswith("/download")):
             respon = response_download(url)
@@ -45,22 +78,21 @@ def handleRequest(connection, client_address):
                      "\r\n" \
                      "Not found"
 
-        connection.send(respon)
-
+        koneksi_client.send(respon)
     finally:
-        print "Closing socket"
-        sock.close()
+        # Clean up the connection
+        koneksi_client.close()
 
 def response_download(req):
-    url, name = req.split("=")
-    print name
-    file = open(name, 'rb').read()
-    length = len(file)
+    url, filename = req.split('=')
+    print filename
+    file = open(filename, 'rb').read()
+    panjang = len(file)
     hasil = "HTTP/1.1 200 OK\r\n" \
             "Content-Type:  multipart/form-data\r\n" \
             "Content-Length: {}\r\n" \
             "\r\n" \
-            "{}".format(length, file)
+            "{}".format(panjang, file)
     return hasil
 
 while True:
