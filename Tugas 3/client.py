@@ -9,32 +9,41 @@ server_address = ('localhost', 10000)
 print >>sys.stderr, 'connecting to %s port %s' % server_address
 sock.connect(server_address)
 
-def requestList():
-    msg = "fetch"
-    sock.sendall(msg)
-    msg = sock.recv(1024)        
-    print msg
-
 def requestBreak():
     msg ="break"
     sock.sendall(msg)
 
 try:
-    print "Cara menggunakan:\n1. Download = 'download/namafile' atau 'download/direktori/namafile"
+    print "Cara menggunakan:\n1. Download = 'download/namafile'"
     print "2. Upload = 'upload/namafile'"
-    print "3. Melihat daftar file = 'fetch/direktori' atau 'fetch'"
+    print "3. Melihat daftar file = 'fetch'"
     print "4. Exit: break"
     while True:
         #splitting command
         req = raw_input("Masukkan perintah: ")
         reqs = req.split("/")
+        sock.sendall(reqs[0])
 
         if(reqs[0]=="download"):
-            ya=0
+            sock.sendall(reqs[1])
+            counter = sock.recv(32)
+            if(counter == '1'):
+                data = sock.recv(32)
+                if(data[0:5]=="START"):
+                    print "Menerima ",data[6:]
+                    fp = open('cong.png','wb+')
+                    ditulis = 0
+                elif(data=="DONE"):
+                    fp.close()
+                else:
+                    print "Blok ", len(data), data[0:10]
+                    fp.write(data)
+
         elif(reqs[0]=="upload"):
-            ya=1
+            print "lel"
         elif(reqs[0]=="fetch"):
-            requestList()
+            msg = sock.recv(1024)        
+            print msg
         else:
             requestBreak()
             break

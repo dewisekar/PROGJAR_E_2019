@@ -12,18 +12,41 @@ sock.bind(server_address)
 sock.listen(1)
 
 def loadImage():
+    #buat yang setara
     image = []
-    image.extend(glob.glob('*.jpg'))
-    image.extend(glob.glob('*.png'))
+    image.extend(glob.glob('*.*'))
     return image
 
 def handleReq(conn):
     files = loadImage()
+    for i in files:
+        print(i)
     while True:
         data = conn.recv(32)
         if(data == 'fetch'):
             for i in files:
                 conn.send(i + "\n")
+        elif(data == 'download'):
+            nama = conn.recv(32)
+            counter = '0'
+            for i in files:
+                if(nama == i):
+                    counter = '1'
+            sock.send(counter)
+            if(counter == 1):
+                conn.send("START {}" . format(nama))
+                ukuran = os.stat(nama).st_size
+                fp = open(nama,'rb')
+                k = fp.read()
+                terkirim=0
+                for x in k:
+                    conn.send(x)
+                    terkirim = terkirim + 1
+                    print "\r Terkirim {} of {} " . format(terkirim,ukuran)
+                conn.send("DONE")
+                fp.close()
+
+
 
 while True:
     print "waiting for a connection"
