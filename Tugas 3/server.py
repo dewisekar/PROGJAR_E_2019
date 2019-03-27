@@ -28,12 +28,14 @@ def handleReq(conn):
                 conn.send(i + "\n")
         elif(data == 'download'):
             nama = conn.recv(32)
+            print nama
             counter = '0'
             for i in files:
                 if(nama == i):
                     counter = '1'
-            sock.send(counter)
-            if(counter == 1):
+            print counter
+            conn.send(counter)
+            if(counter == '1'):
                 conn.send("START {}" . format(nama))
                 ukuran = os.stat(nama).st_size
                 fp = open(nama,'rb')
