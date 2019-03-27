@@ -28,16 +28,19 @@ try:
             sock.sendall(reqs[1])
             counter = sock.recv(32)
             if(counter == '1'):
-                data = sock.recv(32)
-                if(data[0:5]=="START"):
-                    print "Menerima ",data[6:]
-                    fp = open('cong.png','wb+')
-                    ditulis = 0
-                elif(data=="DONE"):
-                    fp.close()
-                else:
-                    print "Blok ", len(data), data[0:10]
-                    fp.write(data)
+                while True:
+                    data = sock.recv(32)
+                    if(data[0:5]=="START"):
+                        print "Menerima ",data[6:]
+                        fp = open('cong.png','wb+')
+                        ditulis = 0
+                    elif(data=="DONE"):
+                        print data[0:6]
+                        fp.close()
+                        break
+                    else:
+                        print "Blok ", len(data), data[0:10]
+                        fp.write(data)
 
         elif(reqs[0]=="upload"):
             print "lel"
