@@ -51,19 +51,22 @@ def handleReq(conn):
                 fp.close()
 
         elif (data == 'upload'):
+            conn.send("READY")
             while True:
+                data = conn.recv(1024)
                 if(data[0:5]=="START"):
                     print data[6:]
-                    namanya =  data[6:]
-                    fp = open(namanya,'wb+')
+                    name = data[6:]
+                    fp = open(name,'wb+')
                     ditulis=0
-                elif(data=="DONE"):
+                elif(data=="FINISH"):
                     fp.close()
+                elif(data=="ENDING"):
                     break
                 else:
                     print "blok ", len(data), data[0:10]
                     fp.write(data)
-            files.append(namanya)
+            files.append(name)
 
 while True:
     print "waiting for a connection"

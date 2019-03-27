@@ -29,7 +29,7 @@ try:
         sock.sendall(reqs[0])
 
         if(reqs[0]=="download"):
-            sock.sendall(reqs[1])
+            sock.send(reqs[1])
             counter = sock.recv(32)
             if(counter == '1'):
                 while True:
@@ -49,19 +49,19 @@ try:
                 print "File tidak ditemukan"
 
         elif(reqs[0]=="upload"):
-            sock.send(reqs[1])
-            sock.send("START {}" . format(reqs[1]))
-            ukuran = os.stat(reqs[1]).st_size
-            fp = open(reqs[1],'rb')
+            nama = reqs[1]
+            sock.send("START {}" . format(nama))
+            ukuran = os.stat(nama).st_size
+            fp = open(nama,'rb')
             k = fp.read()
             terkirim=0
             for x in k:
                 sock.send(x)
                 terkirim = terkirim + 1
-                print "\r Terkirim {} of {} " . format(terkirim,ukuran)
+                print "\r terkirim {} of {} " . format(terkirim,ukuran)
             fp.close()
-            sock.send("DONE")
-            
+            sock.send("FINISH")
+            sock.send("ENDING")
 
         elif(reqs[0]=="fetch"):
             msg = sock.recv(1024)        
